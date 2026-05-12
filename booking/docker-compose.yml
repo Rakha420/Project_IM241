@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  web-server:
+    image: php:8.1-apache
+    container_name: smart_meeting_web
+    ports:
+      # Menggunakan port 8082 karena 8000 dan 8080 sudah terpakai 
+      - "8081:80"
+    volumes:
+      - .:/var/www/html
+    networks:
+      - smart-net
+    command: >
+      sh -c "docker-php-ext-install mysqli && apache2-foreground"
+
+  db-server:
+    image: mysql:8.0
+    container_name: smart_meeting_db
+    # Baris ini sangat penting agar DBeaver bisa konek tanpa error plugin
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret_password
+      - MYSQL_DATABASE=db_office_smart
+    ports:
+      # Menggunakan port 3308 karena 3306, 33061, dan 3307 sudah terpakai 
+      - "3307:3306"
+    networks:
+      - smart-net
+
+networks:
+  smart-net:
+    driver: bridge
